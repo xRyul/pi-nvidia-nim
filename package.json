@@ -5,7 +5,8 @@
   "type": "module",
   "keywords": ["pi-package"],
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./index.ts"],
+    "image": "https://raw.githubusercontent.com/xRyul/pi-nvidia-nim/main/screenshot.png"
   },
   "scripts": {
     "clean": "echo 'nothing to clean'",
