@@ -658,14 +658,34 @@ export default function (pi: ExtensionAPI) {
 			if (choice) {
 				const model = lineToModel.get(choice);
 				if (!model) return;
-				const fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
+
+				// Try to find in registry first; if not found, the model may not
+				// have been registered yet (e.g., discovered but not in curated list).
+				// In that case, re-register the full model list and try again.
+				let fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
+				if (!fullModel) {
+					// Force re-register all models
+					const allModels = Array.from(modelMap.values());
+					pi.registerProvider(PROVIDER_NAME, {
+						baseUrl: NVIDIA_NIM_BASE_URL,
+						apiKey: NVIDIA_NIM_API_KEY_ENV,
+						api: "openai-completions",
+						authHeader: true,
+						models: allModels,
+						streamSimple: nimStreamSimple,
+					});
+					fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
+				}
+
 				if (fullModel) {
 					const success = await pi.setModel(fullModel);
 					if (success) {
 						ctx.ui.notify(`Switched to ${model.id}`, "info");
 					} else {
-						ctx.ui.notify(`Failed to switch — check your API key`, "error");
+						ctx.ui.notify(`Failed to switch to ${model.id} — check your NVIDIA_NIM_API_KEY`, "error");
 					}
+				} else {
+					ctx.ui.notify(`Model ${model.id} not found in registry`, "error");
 				}
 			}
 		},
