@@ -24,7 +24,7 @@ Add this to your `~/.bashrc`, `~/.zshrc`, or shell profile to persist it.
 **As a pi package (recommended):**
 
 ```bash
-pi install git:github.com/user/pi-nvidia-nim
+pi install git:github.com/xRyul/pi-nvidia-nim
 ```
 
 **Or load directly:**
@@ -44,8 +44,7 @@ cp -r pi-nvidia-nim ~/.pi/agent/extensions/pi-nvidia-nim
 Once loaded, NVIDIA NIM models appear in the `/model` selector under the `nvidia-nim` provider. You can also:
 
 - Press **Ctrl+L** to open the model selector and search for `nvidia-nim`
-- Use `/nim-models` to browse and switch to any NIM model
-- Use `/nim-refresh` to fetch the latest models from the API
+- Use `/scoped-models` to pin your favourite NIM models for quick switching
 
 ### CLI
 
