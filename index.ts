@@ -330,6 +330,33 @@ const CONTEXT_WINDOWS: Record<string, number> = {
 	"ibm/granite-3.0-3b-a800m-instruct": 8192,
 	"ibm/granite-34b-code-instruct": 8192,
 	"ibm/granite-8b-code-instruct": 8192,
+	// Older / smaller models with limited context
+	"upstage/solar-10.7b-instruct": 4096,
+	"01-ai/yi-large": 32768,
+	"databricks/dbrx-instruct": 32768,
+	"baichuan-inc/baichuan2-13b-chat": 4096,
+	"thudm/chatglm3-6b": 8192,
+	"deepseek-ai/deepseek-coder-6.7b-instruct": 16384,
+	"tiiuae/falcon3-7b-instruct": 8192,
+	"zyphra/zamba2-7b-instruct": 4096,
+	"aisingapore/sea-lion-7b-instruct": 4096,
+	"mediatek/breeze-7b-instruct": 4096,
+	"meta/codellama-70b": 16384,
+	"mistralai/mistral-7b-instruct-v0.2": 32768,
+	"mistralai/mistral-7b-instruct-v0.3": 32768,
+	"nv-mistralai/mistral-nemo-12b-instruct": 131072,
+	"nvidia/nemotron-mini-4b-instruct": 4096,
+	"nvidia/nemotron-4-mini-hindi-4b-instruct": 4096,
+	"nvidia/usdcode-llama-3.1-70b-instruct": 131072,
+	"sarvamai/sarvam-m": 32768,
+	"writer/palmyra-creative-122b": 32768,
+	"writer/palmyra-fin-70b-32k": 32768,
+	"writer/palmyra-med-70b": 8192,
+	"writer/palmyra-med-70b-32k": 32768,
+	"igenius/colosseum_355b_instruct_16k": 16384,
+	"igenius/italia_10b_instruct_16k": 16384,
+	"rakuten/rakutenai-7b-chat": 4096,
+	"rakuten/rakutenai-7b-instruct": 4096,
 };
 
 // Known max output tokens
@@ -520,8 +547,8 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 
 	const isReasoning = REASONING_MODELS.has(modelId);
 	const isVision = VISION_MODELS.has(modelId);
-	const contextWindow = CONTEXT_WINDOWS[modelId] ?? 32768;
-	const maxTokens = MAX_TOKENS[modelId] ?? 8192;
+	const contextWindow = CONTEXT_WINDOWS[modelId] ?? 4096;
+	const maxTokens = MAX_TOKENS[modelId] ?? Math.min(2048, contextWindow);
 
 	const entry: NimModelEntry = {
 		id: modelId,
