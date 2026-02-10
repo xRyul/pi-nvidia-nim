@@ -143,16 +143,6 @@ The only configuration needed is the `NVIDIA_NIM_API_KEY` environment variable. 
 - Rate limits on free preview keys are relatively strict; you may encounter 429 errors during heavy usage
 - MiniMax models use `<think>` tags inline in content rather than the `reasoning_content` field
 
-## ⚠️ Usage Notice
-
-This extension uses the [NVIDIA NIM](https://www.nvidia.com/en-us/ai-data-science/products/nim-microservices/) free API tier, which is intended **for development and prototyping only**, not for commercial use. From NVIDIA's website:
-
-> *Free Development Access to NIM — Get access to unlimited prototyping with hosted APIs for NIM accelerated by DGX Cloud, or download and self-host NIM microservices for research and development as part of the NVIDIA Developer program.*
-
-For production or commercial use, refer to [NVIDIA's NIM pricing and licensing](https://www.nvidia.com/en-us/ai-data-science/products/nim-microservices/).
-
-This is an unofficial community extension and is not affiliated with or endorsed by NVIDIA.
-
 ## License
 
 MIT
