@@ -721,18 +721,29 @@ export default function (pi: ExtensionAPI) {
 				searchContainer.addChild(searchInput);
 				container.addChild(searchContainer);
 
-				// SelectList with scrolling — show at most 20 visible items
-				const maxVisible = Math.min(items.length, 20);
-				const selectList = new SelectList(items, maxVisible, {
+				// SelectList theme (reused when rebuilding)
+				const selectListTheme = {
 					selectedPrefix: (t: string) => theme.fg("accent", t),
 					selectedText: (t: string) => theme.fg("accent", t),
 					description: (t: string) => theme.fg("muted", t),
 					scrollInfo: (t: string) => theme.fg("dim", t),
 					noMatch: (t: string) => theme.fg("warning", t),
-				});
-				selectList.onSelect = (item: SelectItem) => done(item.value);
-				selectList.onCancel = () => done(null);
-				container.addChild(selectList);
+				};
+
+				// Container slot for the SelectList — allows swapping it on filter changes
+				const listSlot = new Container();
+				const maxVisible = Math.min(items.length, 20);
+
+				function makeSelectList(filteredItems: SelectItem[]): SelectList {
+					const sl = new SelectList(filteredItems, maxVisible, selectListTheme);
+					sl.onSelect = (item: SelectItem) => done(item.value);
+					sl.onCancel = () => done(null);
+					return sl;
+				}
+
+				let selectList = makeSelectList(items);
+				listSlot.addChild(selectList);
+				container.addChild(listSlot);
 
 				// Help text
 				container.addChild(
@@ -742,9 +753,29 @@ export default function (pi: ExtensionAPI) {
 				// Bottom border
 				container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
 
-				// Wire search input changes to filter the list
+				// Filter items using case-insensitive substring match on both value and label
+				let lastFilter = "";
+				function applyFilter() {
+					const filterText = searchInput.getValue().toLowerCase();
+					if (filterText === lastFilter) return;
+					lastFilter = filterText;
+
+					const filtered = filterText
+						? items.filter(
+								(item) =>
+									item.value.toLowerCase().includes(filterText) ||
+									(item.label && item.label.toLowerCase().includes(filterText)) ||
+									(item.description && item.description.toLowerCase().includes(filterText)),
+							)
+						: items;
+
+					selectList = makeSelectList(filtered);
+					listSlot.clear();
+					listSlot.addChild(selectList);
+				}
+
+				// Wire search input callbacks
 				searchInput.onSubmit = () => {
-					// Enter in search field → select current item
 					const selected = selectList.getSelectedItem();
 					if (selected) done(selected.value);
 				};
@@ -765,9 +796,8 @@ export default function (pi: ExtensionAPI) {
 						) {
 							selectList.handleInput(data);
 						} else {
-							// Send to search input for filtering
 							searchInput.handleInput(data);
-							selectList.setFilter(searchInput.getValue());
+							applyFilter();
 						}
 						tui.requestRender();
 					},
