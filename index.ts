@@ -42,6 +42,8 @@ import type {
 } from "@mariozechner/pi-ai";
 import { streamSimpleOpenAICompletions } from "@mariozechner/pi-ai";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { DynamicBorder } from "@mariozechner/pi-coding-agent";
+import { Container, Input, Key, matchesKey, type SelectItem, SelectList, Text } from "@mariozechner/pi-tui";
 
 // =============================================================================
 // Constants
@@ -688,31 +690,98 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			// Build display lines and a lookup map from display string → model
-			const lineToModel = new Map<string, NimModelEntry>();
-			const lines = models.map((m) => {
+			// Build SelectItem list with model details
+			const items: SelectItem[] = models.map((m) => {
 				const tags: string[] = [];
 				if (m.reasoning) tags.push("reasoning");
 				if (m.input.includes("image")) tags.push("vision");
 				const tagStr = tags.length > 0 ? ` [${tags.join(", ")}]` : "";
-				const line = `${m.id}${tagStr} (ctx: ${(m.contextWindow / 1024).toFixed(0)}k)`;
-				lineToModel.set(line, m);
-				return line;
+				return {
+					value: m.id,
+					label: m.id,
+					description: `${tagStr} ctx:${(m.contextWindow / 1024).toFixed(0)}k`,
+				};
 			});
 
-			const choice = await ctx.ui.select(`NVIDIA NIM Models (${models.length})`, lines);
+			const selectedId = await ctx.ui.custom<string | null>((tui, theme, _kb, done) => {
+				const container = new Container();
 
-			if (choice) {
-				const model = lineToModel.get(choice);
+				// Top border
+				container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+
+				// Title
+				container.addChild(
+					new Text(theme.fg("accent", theme.bold(`NVIDIA NIM Models (${models.length})`)), 1, 0),
+				);
+
+				// Search input
+				const searchInput = new Input();
+				const searchContainer = new Container();
+				searchContainer.addChild(new Text(theme.fg("dim", " Search: "), 0, 0));
+				searchContainer.addChild(searchInput);
+				container.addChild(searchContainer);
+
+				// SelectList with scrolling — show at most 20 visible items
+				const maxVisible = Math.min(items.length, 20);
+				const selectList = new SelectList(items, maxVisible, {
+					selectedPrefix: (t: string) => theme.fg("accent", t),
+					selectedText: (t: string) => theme.fg("accent", t),
+					description: (t: string) => theme.fg("muted", t),
+					scrollInfo: (t: string) => theme.fg("dim", t),
+					noMatch: (t: string) => theme.fg("warning", t),
+				});
+				selectList.onSelect = (item: SelectItem) => done(item.value);
+				selectList.onCancel = () => done(null);
+				container.addChild(selectList);
+
+				// Help text
+				container.addChild(
+					new Text(theme.fg("dim", " ↑↓ navigate • type to search • enter select • esc cancel"), 1, 0),
+				);
+
+				// Bottom border
+				container.addChild(new DynamicBorder((s: string) => theme.fg("accent", s)));
+
+				// Wire search input changes to filter the list
+				searchInput.onSubmit = () => {
+					// Enter in search field → select current item
+					const selected = selectList.getSelectedItem();
+					if (selected) done(selected.value);
+				};
+				searchInput.onEscape = () => done(null);
+
+				return {
+					render: (w: number) => container.render(w),
+					invalidate: () => container.invalidate(),
+					handleInput: (data: string) => {
+						// Navigation keys go to SelectList, everything else is search input
+						if (
+							matchesKey(data, Key.up) ||
+							matchesKey(data, Key.down) ||
+							matchesKey(data, Key.enter) ||
+							matchesKey(data, Key.escape) ||
+							matchesKey(data, Key.pageUp) ||
+							matchesKey(data, Key.pageDown)
+						) {
+							selectList.handleInput(data);
+						} else {
+							// Send to search input for filtering
+							searchInput.handleInput(data);
+							selectList.setFilter(searchInput.getValue());
+						}
+						tui.requestRender();
+					},
+				};
+			});
+
+			if (selectedId) {
+				// Find the model entry
+				const model = modelMap.get(selectedId);
 				if (!model) return;
 
-				// Try to find in registry first; if not found, the model may not
-				// have been registered yet (e.g., discovered but not in curated list).
-				// In that case, re-register the full model list and try again.
+				// Try to find in registry first; if not found, re-register all models
 				let fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
 				if (!fullModel) {
-					// Model not in registry — force re-register all models directly
-					// on the registry (pi.registerProvider only queues, doesn't apply)
 					const allModels = Array.from(modelMap.values());
 					ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
 						baseUrl: NVIDIA_NIM_BASE_URL,
