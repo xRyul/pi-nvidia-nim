@@ -690,17 +690,19 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			// Build SelectItem list with model details
+			// Build SelectItem list with fixed-width column layout in label
+			// (no description — avoids SelectList's 30-char truncation + col-32 padding)
+			const idColWidth = Math.min(Math.max(...models.map((m) => m.id.length)), 44);
 			const items: SelectItem[] = models.map((m) => {
 				const tags: string[] = [];
 				if (m.reasoning) tags.push("reasoning");
 				if (m.input.includes("image")) tags.push("vision");
-				const ctxStr = `${(m.contextWindow / 1024).toFixed(0)}k`;
+				const paddedId = m.id.length <= idColWidth ? m.id.padEnd(idColWidth) : m.id;
+				const ctx = `${(m.contextWindow / 1024).toFixed(0)}k`.padStart(6);
 				const tagStr = tags.length > 0 ? `  ${tags.join(", ")}` : "";
 				return {
 					value: m.id,
-					label: m.id,
-					description: `${ctxStr}${tagStr}`,
+					label: `${paddedId} ${ctx}${tagStr}`,
 				};
 			});
 
