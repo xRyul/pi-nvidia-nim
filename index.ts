@@ -466,6 +466,23 @@ function nimStreamSimple(
 				p.reasoning_effort = "low";
 			}
 
+			// Normalize content arrays to plain strings where possible.
+			// Many older/smaller NIM models (e.g., solar, baichuan, falcon) reject the
+			// array format [{"type":"text","text":"..."}] and require a plain string.
+			// This is safe for all models since plain strings are universally accepted.
+			const messages = p.messages as Array<Record<string, unknown>> | undefined;
+			if (messages) {
+				for (const msg of messages) {
+					if (Array.isArray(msg.content)) {
+						const parts = msg.content as Array<Record<string, unknown>>;
+						const allText = parts.every((part) => part.type === "text");
+						if (allText) {
+							msg.content = parts.map((part) => part.text as string).join("\n");
+						}
+					}
+				}
+			}
+
 			// Chain to original onPayload if present
 			options?.onPayload?.(params);
 		},
