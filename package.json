@@ -1,11 +1,15 @@
 {
   "name": "pi-nvidia-nim",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "NVIDIA NIM API provider extension for pi coding agent — access 100+ models from build.nvidia.com",
   "type": "module",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package"
+  ],
   "pi": {
-    "extensions": ["./index.ts"],
+    "extensions": [
+      "./index.ts"
+    ],
     "image": "https://raw.githubusercontent.com/xRyul/pi-nvidia-nim/main/screenshot.png"
   },
   "scripts": {
@@ -13,5 +17,10 @@
     "build": "echo 'nothing to build'",
     "check": "echo 'nothing to check'"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xRyul/pi-nvidia-nim.git"
+  },
+  "homepage": "https://github.com/xRyul/pi-nvidia-nim",
   "license": "MIT"
 }
