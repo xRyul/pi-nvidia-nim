@@ -641,18 +641,23 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
+			// Build display lines and a lookup map from display string → model
+			const lineToModel = new Map<string, NimModelEntry>();
 			const lines = models.map((m) => {
 				const tags: string[] = [];
 				if (m.reasoning) tags.push("reasoning");
 				if (m.input.includes("image")) tags.push("vision");
 				const tagStr = tags.length > 0 ? ` [${tags.join(", ")}]` : "";
-				return `${m.id}${tagStr} (ctx: ${(m.contextWindow / 1024).toFixed(0)}k)`;
+				const line = `${m.id}${tagStr} (ctx: ${(m.contextWindow / 1024).toFixed(0)}k)`;
+				lineToModel.set(line, m);
+				return line;
 			});
 
 			const choice = await ctx.ui.select(`NVIDIA NIM Models (${models.length})`, lines);
 
-			if (choice !== undefined) {
-				const model = models[choice];
+			if (choice) {
+				const model = lineToModel.get(choice);
+				if (!model) return;
 				const fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
 				if (fullModel) {
 					const success = await pi.setModel(fullModel);
