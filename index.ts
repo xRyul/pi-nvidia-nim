@@ -617,10 +617,13 @@ export default function (pi: ExtensionAPI) {
 			}
 		}
 
-		// Re-register with full model list if we found new ones
+		// Re-register with full model list if we found new ones.
+		// NOTE: must use ctx.modelRegistry.registerProvider() here, not pi.registerProvider().
+		// pi.registerProvider() only queues registrations for the initial extension load.
+		// From event handlers/commands, we need to call the registry directly.
 		if (newModelsAdded > 0) {
 			const allModels = Array.from(modelMap.values());
-			pi.registerProvider(PROVIDER_NAME, {
+			ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
 				baseUrl: NVIDIA_NIM_BASE_URL,
 				apiKey: NVIDIA_NIM_API_KEY_ENV,
 				api: "openai-completions",
@@ -664,9 +667,10 @@ export default function (pi: ExtensionAPI) {
 				// In that case, re-register the full model list and try again.
 				let fullModel = ctx.modelRegistry.find(PROVIDER_NAME, model.id);
 				if (!fullModel) {
-					// Force re-register all models
+					// Model not in registry — force re-register all models directly
+					// on the registry (pi.registerProvider only queues, doesn't apply)
 					const allModels = Array.from(modelMap.values());
-					pi.registerProvider(PROVIDER_NAME, {
+					ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
 						baseUrl: NVIDIA_NIM_BASE_URL,
 						apiKey: NVIDIA_NIM_API_KEY_ENV,
 						api: "openai-completions",
@@ -720,7 +724,7 @@ export default function (pi: ExtensionAPI) {
 			}
 
 			const allModels = Array.from(modelMap.values());
-			pi.registerProvider(PROVIDER_NAME, {
+			ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
 				baseUrl: NVIDIA_NIM_BASE_URL,
 				apiKey: NVIDIA_NIM_API_KEY_ENV,
 				api: "openai-completions",
