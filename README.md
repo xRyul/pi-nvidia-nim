@@ -1,6 +1,6 @@
 # pi-nvidia-nim
 
-NVIDIA NIM API provider extension for [pi coding agent](https://github.com/badlogic/pi-mono) — access 100+ models from [build.nvidia.com](https://build.nvidia.com) including DeepSeek V3.2, Kimi K2.5, MiniMax M2.1, GLM-4.7, Qwen3, Llama 4, and many more.
+NVIDIA NIM API provider extension for [pi coding agent](https://github.com/badlogic/pi-mono) - access 100+ models from [build.nvidia.com](https://build.nvidia.com) including DeepSeek V3.2, Kimi K2.5, MiniMax M2.1, GLM-4.7, Qwen3, Llama 4, and many more.
 
 ## Setup
 
@@ -67,14 +67,14 @@ NVIDIA NIM models use a non-standard `chat_template_kwargs` parameter to enable 
 
 When you change the thinking level in pi (`Shift+Tab` to cycle), the extension:
 
-1. **Maps `"minimal"` → `"low"`** — NIM only accepts `low`, `medium`, `high` (not `minimal`). Selecting "minimal" in pi works fine; it's silently mapped.
+1. **Maps `"minimal"` → `"low"`** - NIM only accepts `low`, `medium`, `high` (not `minimal`). Selecting "minimal" in pi works fine; it's silently mapped.
 2. **Injects `chat_template_kwargs`** per model to actually enable thinking:
    - DeepSeek V3.x, R1 distills: `{ thinking: true }`
    - GLM-4.7: `{ enable_thinking: true, clear_thinking: false }`
    - Kimi K2.5, K2-thinking: `{ thinking: true }`
    - Qwen3, QwQ: `{ enable_thinking: true }`
 3. **Explicitly disables thinking** when the level is "off" for models that think by default (e.g., GLM-4.7).
-4. **Uses `system` role** instead of `developer` for all NIM models — the `developer` role combined with `chat_template_kwargs` causes 500 errors on NIM.
+4. **Uses `system` role** instead of `developer` for all NIM models - the `developer` role combined with `chat_template_kwargs` causes 500 errors on NIM.
 
 ### Supported thinking levels
 
@@ -128,7 +128,7 @@ The custom streamer:
 2. Injects `chat_template_kwargs` for models that need it to enable thinking
 3. Maps unsupported thinking levels (`minimal` → `low`)
 4. Suppresses `reasoning_effort` for models that don't respond to it (e.g., DeepSeek without kwargs)
-5. Uses the standard OpenAI SSE streaming format — pi already parses `reasoning_content` and `reasoning` fields from streaming deltas
+5. Uses the standard OpenAI SSE streaming format - pi already parses `reasoning_content` and `reasoning` fields from streaming deltas
 
 ## Configuration
 
