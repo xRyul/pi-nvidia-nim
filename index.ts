@@ -695,11 +695,12 @@ export default function (pi: ExtensionAPI) {
 				const tags: string[] = [];
 				if (m.reasoning) tags.push("reasoning");
 				if (m.input.includes("image")) tags.push("vision");
-				const tagStr = tags.length > 0 ? ` [${tags.join(", ")}]` : "";
+				const ctxStr = `${(m.contextWindow / 1024).toFixed(0)}k`;
+				const tagStr = tags.length > 0 ? `  ${tags.join(", ")}` : "";
 				return {
 					value: m.id,
 					label: m.id,
-					description: `${tagStr} ctx:${(m.contextWindow / 1024).toFixed(0)}k`,
+					description: `${ctxStr}${tagStr}`,
 				};
 			});
 
