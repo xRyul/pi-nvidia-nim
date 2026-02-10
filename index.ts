@@ -26,7 +26,7 @@
  * - Kimi K2.5:     `chat_template_kwargs: { thinking: true }` (also accepts reasoning_effort)
  * - Qwen3:         `chat_template_kwargs: { enable_thinking: true }`
  *
- * NIM only accepts `reasoning_effort` values of "low", "medium", "high" — NOT
+ * NIM only accepts `reasoning_effort` values of "low", "medium", "high" - NOT
  * "minimal". The extension maps pi's "minimal" level to "low" automatically.
  *
  * Some models (e.g., GLM-4.7) always produce reasoning output regardless of
@@ -73,7 +73,7 @@ interface ThinkingConfig {
 }
 
 const THINKING_CONFIGS: Record<string, ThinkingConfig> = {
-	// DeepSeek models need chat_template_kwargs — reasoning_effort alone doesn't trigger thinking
+	// DeepSeek models need chat_template_kwargs - reasoning_effort alone doesn't trigger thinking
 	"deepseek-ai/deepseek-v3.2": {
 		enableKwargs: { thinking: true },
 		disableKwargs: { thinking: false },
@@ -381,7 +381,7 @@ const MAX_TOKENS: Record<string, number> = {
 };
 
 // =============================================================================
-// Curated "featured" models — listed first in the model selector
+// Curated "featured" models - listed first in the model selector
 // =============================================================================
 
 const FEATURED_MODELS = [
@@ -434,7 +434,7 @@ const FEATURED_MODELS = [
 ];
 
 // =============================================================================
-// Custom streaming — wraps standard openai-completions with NIM-specific fixes
+// Custom streaming - wraps standard openai-completions with NIM-specific fixes
 // =============================================================================
 
 /**
@@ -467,7 +467,7 @@ function nimStreamSimple(
 	// supports it alongside chat_template_kwargs (like Kimi).
 	let effectiveReasoning = mappedReasoning;
 	if (thinkingConfig && isThinkingEnabled && !thinkingConfig.sendReasoningEffort) {
-		// Don't send reasoning_effort — we'll use chat_template_kwargs instead.
+		// Don't send reasoning_effort - we'll use chat_template_kwargs instead.
 		// Setting to undefined prevents buildParams from adding reasoning_effort.
 		effectiveReasoning = undefined;
 	}
@@ -561,10 +561,10 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 	};
 
 	// Default compat for all NIM models:
-	// - supportsReasoningEffort: false — we handle thinking via streamSimple + chat_template_kwargs
-	// - supportsDeveloperRole: false — "developer" role + chat_template_kwargs causes 500 on NIM
+	// - supportsReasoningEffort: false - we handle thinking via streamSimple + chat_template_kwargs
+	// - supportsDeveloperRole: false - "developer" role + chat_template_kwargs causes 500 on NIM
 	//   (developer role alone works, but combined with thinking kwargs it breaks)
-	// - maxTokensField: "max_tokens" — safer default for heterogeneous backends
+	// - maxTokensField: "max_tokens" - safer default for heterogeneous backends
 	entry.compat = {
 		supportsReasoningEffort: false,
 		supportsDeveloperRole: false,
