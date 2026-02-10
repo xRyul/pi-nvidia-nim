@@ -1,0 +1,16 @@
+{
+  "name": "pi-nvidia-nim",
+  "version": "1.0.0",
+  "description": "NVIDIA NIM API provider extension for pi coding agent — access 100+ models from build.nvidia.com",
+  "type": "module",
+  "keywords": ["pi-package"],
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "scripts": {
+    "clean": "echo 'nothing to clean'",
+    "build": "echo 'nothing to build'",
+    "check": "echo 'nothing to check'"
+  },
+  "license": "MIT"
+}
