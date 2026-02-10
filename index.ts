@@ -838,48 +838,4 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	// Register a command to refresh models from the API
-	pi.registerCommand("nim-refresh", {
-		description: "Refresh NVIDIA NIM model list from API",
-		handler: async (_args, ctx) => {
-			const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
-			if (!apiKey) {
-				ctx.ui.notify(`Set ${NVIDIA_NIM_API_KEY_ENV} env var first`, "error");
-				return;
-			}
-
-			ctx.ui.notify("Fetching models from NVIDIA NIM API...", "info");
-			const liveModelIds = await fetchNimModels(apiKey);
-
-			if (liveModelIds.length === 0) {
-				ctx.ui.notify("Could not fetch models. Check your API key.", "error");
-				return;
-			}
-
-			let newCount = 0;
-			for (const id of liveModelIds) {
-				if (modelMap.has(id)) continue;
-				const entry = buildModelEntry(id);
-				if (entry) {
-					modelMap.set(id, entry);
-					newCount++;
-				}
-			}
-
-			const allModels = Array.from(modelMap.values());
-			ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
-				baseUrl: NVIDIA_NIM_BASE_URL,
-				apiKey: NVIDIA_NIM_API_KEY_ENV,
-				api: "openai-completions",
-				authHeader: true,
-				models: allModels,
-				streamSimple: nimStreamSimple,
-			});
-
-			ctx.ui.notify(
-				`NVIDIA NIM: ${allModels.length} total models (${newCount} newly discovered)`,
-				"info",
-			);
-		},
-	});
 }
