@@ -472,10 +472,20 @@ function nimStreamSimple(
 		effectiveReasoning = undefined;
 	}
 
+	// Resolve API key at request time
+	const nimApiKey = process.env["NVIDIA_NIM_API_KEY"];
+	if (!nimApiKey) {
+		throw new Error(
+			`NVIDIA NIM: API key not found in process.env. ` +
+			`Keys containing 'NIM' or 'NVIDIA': [${Object.keys(process.env).filter(k => k.includes('NIM') || k.includes('NVIDIA')).join(', ')}]. ` +
+			`Total env keys: ${Object.keys(process.env).length}`
+		);
+	}
+
 	const modifiedOptions: SimpleStreamOptions = {
 		...options,
 		reasoning: effectiveReasoning,
-		apiKey: process.env[NVIDIA_NIM_API_KEY_ENV],
+		apiKey: nimApiKey,
 		onPayload: (params: unknown) => {
 			const p = params as Record<string, unknown>;
 
