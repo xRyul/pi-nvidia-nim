@@ -10,7 +10,7 @@
     "extensions": [
       "./index.ts"
     ],
-    "image": "https://raw.githubusercontent.com/xRyul/pi-nvidia-nim/main/screenshot.png"
+    "video": "https://raw.githubusercontent.com/xRyul/pi-nvidia-nim/main/video_demo_psnr.mp4"
   },
   "scripts": {
     "clean": "echo 'nothing to clean'",
