@@ -48,7 +48,8 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 // =============================================================================
 
 const NVIDIA_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
-const NVIDIA_NIM_API_KEY_ENV = "NVIDIA_NIM_API_KEY";
+const NVIDIA_NIM_API_KEY_ENV_NAME = "NVIDIA_NIM_API_KEY"; // Bare env var name for process.env
+const NVIDIA_NIM_API_KEY_ENV = "$NVIDIA_NIM_API_KEY"; // $ prefix for pi's apiKey resolution
 const PROVIDER_NAME = "nvidia-nim";
 
 // =============================================================================
@@ -638,10 +639,10 @@ export default function (pi: ExtensionAPI) {
 
 	// On session start, discover additional models from the API
 	pi.on("session_start", async (_event, ctx) => {
-		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
+		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV_NAME];
 		if (!apiKey) {
 			ctx.ui.notify(
-				`NVIDIA NIM: Set ${NVIDIA_NIM_API_KEY_ENV} env var to enable models. Get a key at https://build.nvidia.com`,
+				`NVIDIA NIM: Set ${NVIDIA_NIM_API_KEY_ENV_NAME} env var to enable models. Get a key at https://build.nvidia.com`,
 				"warning",
 			);
 			return;
