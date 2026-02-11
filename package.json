@@ -17,6 +17,11 @@
     "build": "echo 'nothing to build'",
     "check": "echo 'nothing to check'"
   },
+  "devDependencies": {
+    "@mariozechner/pi-coding-agent": "^0.52.9",
+    "@mariozechner/pi-ai": "^0.52.9",
+    "@types/node": "^22.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/xRyul/pi-nvidia-nim.git"

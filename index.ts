@@ -336,7 +336,6 @@ const CONTEXT_WINDOWS: Record<string, number> = {
 	"databricks/dbrx-instruct": 32768,
 	"baichuan-inc/baichuan2-13b-chat": 4096,
 	"thudm/chatglm3-6b": 8192,
-	"deepseek-ai/deepseek-coder-6.7b-instruct": 16384,
 	"tiiuae/falcon3-7b-instruct": 8192,
 	"zyphra/zamba2-7b-instruct": 4096,
 	"aisingapore/sea-lion-7b-instruct": 4096,
@@ -453,7 +452,7 @@ function nimStreamSimple(
 ): AssistantMessageEventStream {
 	const thinkingConfig = THINKING_CONFIGS[model.id];
 	const reasoning = options?.reasoning;
-	const isThinkingEnabled = reasoning && reasoning !== "off";
+	const isThinkingEnabled = !!reasoning;
 
 	// Map "minimal" → "low" since NIM rejects "minimal" with a 400 error.
 	// NIM only accepts: "low", "medium", "high"
@@ -527,7 +526,7 @@ function nimStreamSimple(
 		},
 	};
 
-	return streamSimpleOpenAICompletions(model, context, modifiedOptions);
+	return streamSimpleOpenAICompletions(model as Model<"openai-completions">, context, modifiedOptions);
 }
 
 // =============================================================================
@@ -649,7 +648,7 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	// On session start, discover additional models from the API
-	pi.on("session_start", async (_event, ctx) => {
+	pi.on("session_start", async (_event: any, ctx: any) => {
 		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
 		if (!apiKey) return; // API key not available, skip model discovery
 
