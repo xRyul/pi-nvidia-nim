@@ -4,9 +4,9 @@ NVIDIA NIM API provider extension for [pi coding agent](https://github.com/badlo
 
 ## Demo
 
-https://github.com/user-attachments/assets/video_demo_psnr.mp4
+[**Watch Video Demo →**](https://raw.githubusercontent.com/xRyul/pi-nvidia-nim/main/video_demo_psnr.mp4)
 
-> Video demonstration showing the extension in action with NVIDIA NIM models
+*Click to watch the extension in action with NVIDIA NIM models*
 
 ## Setup
 
