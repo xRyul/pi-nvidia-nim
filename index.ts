@@ -451,13 +451,6 @@ function nimStreamSimple(
 	context: Context,
 	options?: SimpleStreamOptions,
 ): AssistantMessageEventStream {
-	// Inject Authorization header at request time (env var may not be available
-	// at extension load time, but is always available at request time)
-	const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
-	const authedModel = apiKey
-		? { ...model, headers: { ...model.headers, Authorization: `Bearer ${apiKey}` } }
-		: model;
-
 	const thinkingConfig = THINKING_CONFIGS[model.id];
 	const reasoning = options?.reasoning;
 	const isThinkingEnabled = reasoning && reasoning !== "off";
@@ -482,6 +475,7 @@ function nimStreamSimple(
 	const modifiedOptions: SimpleStreamOptions = {
 		...options,
 		reasoning: effectiveReasoning,
+		apiKey: process.env[NVIDIA_NIM_API_KEY_ENV],
 		onPayload: (params: unknown) => {
 			const p = params as Record<string, unknown>;
 
@@ -522,7 +516,7 @@ function nimStreamSimple(
 		},
 	};
 
-	return streamSimpleOpenAICompletions(authedModel, context, modifiedOptions);
+	return streamSimpleOpenAICompletions(model, context, modifiedOptions);
 }
 
 // =============================================================================
