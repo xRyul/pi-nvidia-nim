@@ -48,8 +48,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 // =============================================================================
 
 const NVIDIA_NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
-const NVIDIA_NIM_API_KEY_ENV_NAME = "NVIDIA_NIM_API_KEY"; // Bare env var name for process.env
-const NVIDIA_NIM_API_KEY_ENV = "$NVIDIA_NIM_API_KEY"; // $ prefix for pi's apiKey resolution
+const NVIDIA_NIM_API_KEY_ENV = "NVIDIA_NIM_API_KEY";
 const PROVIDER_NAME = "nvidia-nim";
 
 // =============================================================================
@@ -532,6 +531,7 @@ interface NimModelEntry {
 	maxTokens: number;
 	cost: { input: number; output: number; cacheRead: number; cacheWrite: number };
 	compat?: Record<string, unknown>;
+	headers?: Record<string, string>;
 }
 
 function makeDisplayName(modelId: string): string {
@@ -551,6 +551,9 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 	const contextWindow = CONTEXT_WINDOWS[modelId] ?? 4096;
 	const maxTokens = MAX_TOKENS[modelId] ?? Math.min(2048, contextWindow);
 
+	// Get API key for Authorization header
+	const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
+
 	const entry: NimModelEntry = {
 		id: modelId,
 		name: makeDisplayName(modelId),
@@ -559,6 +562,7 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 		contextWindow,
 		maxTokens,
 		cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+		headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
 	};
 
 	// Default compat for all NIM models:
@@ -632,17 +636,16 @@ export default function (pi: ExtensionAPI) {
 		baseUrl: NVIDIA_NIM_BASE_URL,
 		apiKey: NVIDIA_NIM_API_KEY_ENV,
 		api: "openai-completions",
-		authHeader: true,
 		models: curatedModels,
 		streamSimple: nimStreamSimple,
 	});
 
 	// On session start, discover additional models from the API
 	pi.on("session_start", async (_event, ctx) => {
-		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV_NAME];
+		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
 		if (!apiKey) {
 			ctx.ui.notify(
-				`NVIDIA NIM: Set ${NVIDIA_NIM_API_KEY_ENV_NAME} env var to enable models. Get a key at https://build.nvidia.com`,
+				`NVIDIA NIM: Set ${NVIDIA_NIM_API_KEY_ENV} env var to enable models. Get a key at https://build.nvidia.com`,
 				"warning",
 			);
 			return;
@@ -672,7 +675,6 @@ export default function (pi: ExtensionAPI) {
 				baseUrl: NVIDIA_NIM_BASE_URL,
 				apiKey: NVIDIA_NIM_API_KEY_ENV,
 				api: "openai-completions",
-				authHeader: true,
 				models: allModels,
 				streamSimple: nimStreamSimple,
 			});
