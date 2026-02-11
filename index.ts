@@ -451,6 +451,13 @@ function nimStreamSimple(
 	context: Context,
 	options?: SimpleStreamOptions,
 ): AssistantMessageEventStream {
+	// Inject Authorization header at request time (env var may not be available
+	// at extension load time, but is always available at request time)
+	const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
+	const authedModel = apiKey
+		? { ...model, headers: { ...model.headers, Authorization: `Bearer ${apiKey}` } }
+		: model;
+
 	const thinkingConfig = THINKING_CONFIGS[model.id];
 	const reasoning = options?.reasoning;
 	const isThinkingEnabled = reasoning && reasoning !== "off";
@@ -515,7 +522,7 @@ function nimStreamSimple(
 		},
 	};
 
-	return streamSimpleOpenAICompletions(model, context, modifiedOptions);
+	return streamSimpleOpenAICompletions(authedModel, context, modifiedOptions);
 }
 
 // =============================================================================
@@ -531,7 +538,6 @@ interface NimModelEntry {
 	maxTokens: number;
 	cost: { input: number; output: number; cacheRead: number; cacheWrite: number };
 	compat?: Record<string, unknown>;
-	headers?: Record<string, string>;
 }
 
 function makeDisplayName(modelId: string): string {
@@ -551,9 +557,6 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 	const contextWindow = CONTEXT_WINDOWS[modelId] ?? 4096;
 	const maxTokens = MAX_TOKENS[modelId] ?? Math.min(2048, contextWindow);
 
-	// Get API key for Authorization header
-	const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
-
 	const entry: NimModelEntry = {
 		id: modelId,
 		name: makeDisplayName(modelId),
@@ -562,7 +565,6 @@ function buildModelEntry(modelId: string): NimModelEntry | null {
 		contextWindow,
 		maxTokens,
 		cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-		headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : undefined,
 	};
 
 	// Default compat for all NIM models:
@@ -643,13 +645,7 @@ export default function (pi: ExtensionAPI) {
 	// On session start, discover additional models from the API
 	pi.on("session_start", async (_event, ctx) => {
 		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
-		if (!apiKey) {
-			ctx.ui.notify(
-				`NVIDIA NIM: Set ${NVIDIA_NIM_API_KEY_ENV} env var to enable models. Get a key at https://build.nvidia.com`,
-				"warning",
-			);
-			return;
-		}
+		if (!apiKey) return; // API key not available, skip model discovery
 
 		// Fetch live model list
 		const liveModelIds = await fetchNimModels(apiKey);
