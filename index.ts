@@ -472,13 +472,14 @@ function nimStreamSimple(
 		effectiveReasoning = undefined;
 	}
 
-	// Resolve API key at request time
+	// Resolve API key at request time - must pass via options.apiKey because
+	// pi-ai's getEnvApiKey() doesn't know about custom providers like "nvidia-nim"
 	const nimApiKey = process.env["NVIDIA_NIM_API_KEY"];
 	if (!nimApiKey) {
 		throw new Error(
-			`NVIDIA NIM: API key not found in process.env. ` +
-			`Keys containing 'NIM' or 'NVIDIA': [${Object.keys(process.env).filter(k => k.includes('NIM') || k.includes('NVIDIA')).join(', ')}]. ` +
-			`Total env keys: ${Object.keys(process.env).length}`
+			`NVIDIA NIM: NVIDIA_NIM_API_KEY environment variable is not set. ` +
+			`Get a free API key at https://build.nvidia.com and export it: ` +
+			`export NVIDIA_NIM_API_KEY=nvapi-...`
 		);
 	}
 
