@@ -1,0 +1,19 @@
+# Development files
+.git/
+.github/
+.gitignore
+tsconfig.json
+
+# Media files (served from GitHub via pi.video/pi.image URLs)
+*.mp4
+*.png
+*.jpg
+*.gif
+*.webp
+screenshot.*
+video_demo*
+
+# Other
+node_modules/
+*.log
+.DS_Store
