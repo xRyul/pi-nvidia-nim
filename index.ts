@@ -638,6 +638,7 @@ export default function (pi: ExtensionAPI) {
 		baseUrl: NVIDIA_NIM_BASE_URL,
 		apiKey: NVIDIA_NIM_API_KEY_ENV,
 		api: "openai-completions",
+		authHeader: true,
 		models: curatedModels,
 		streamSimple: nimStreamSimple,
 	});
@@ -671,6 +672,7 @@ export default function (pi: ExtensionAPI) {
 				baseUrl: NVIDIA_NIM_BASE_URL,
 				apiKey: NVIDIA_NIM_API_KEY_ENV,
 				api: "openai-completions",
+				authHeader: true,
 				models: allModels,
 				streamSimple: nimStreamSimple,
 			});
