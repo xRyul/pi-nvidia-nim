@@ -22,14 +22,14 @@
  * parameters:
  *
  * - DeepSeek V3.x: `chat_template_kwargs: { thinking: true }`
- * - GLM-4.7:       `chat_template_kwargs: { enable_thinking: true, clear_thinking: false }`
+ * - GLM-5/4.7:     `chat_template_kwargs: { enable_thinking: true, clear_thinking: false }`
  * - Kimi K2.5:     `chat_template_kwargs: { thinking: true }` (also accepts reasoning_effort)
  * - Qwen3:         `chat_template_kwargs: { enable_thinking: true }`
  *
  * NIM only accepts `reasoning_effort` values of "low", "medium", "high" - NOT
  * "minimal". The extension maps pi's "minimal" level to "low" automatically.
  *
- * Some models (e.g., GLM-4.7) always produce reasoning output regardless of
+ * Some models (e.g., GLM-5, GLM-4.7) always produce reasoning output regardless of
  * thinking settings.
  */
 
@@ -60,7 +60,7 @@ const PROVIDER_NAME = "nvidia-nim";
  * When a user enables thinking in pi (any level > off), we inject these kwargs
  * into the request body. Models not listed here either:
  * - Don't support thinking (non-reasoning models)
- * - Always think regardless (GLM-4.7 without explicit kwargs)
+ * - Always think regardless (GLM models without explicit kwargs)
  * - Work with standard reasoning_effort (rare on NIM)
  */
 interface ThinkingConfig {
@@ -102,8 +102,12 @@ const THINKING_CONFIGS: Record<string, ThinkingConfig> = {
 		enableKwargs: { thinking: true },
 		disableKwargs: { thinking: false },
 	},
-	// GLM-4.7 always thinks by default, but can be controlled
+	// GLM models (Z-AI) - think by default, but can be controlled
 	"z-ai/glm4.7": {
+		enableKwargs: { enable_thinking: true, clear_thinking: false },
+		disableKwargs: { enable_thinking: false },
+	},
+	"z-ai/glm5": {
 		enableKwargs: { enable_thinking: true, clear_thinking: false },
 		disableKwargs: { enable_thinking: false },
 	},
@@ -320,6 +324,7 @@ const CONTEXT_WINDOWS: Record<string, number> = {
 	"openai/gpt-oss-20b": 131072,
 	// Z-AI / GLM
 	"z-ai/glm4.7": 131072,
+	"z-ai/glm5": 131072,
 	// StepFun
 	"stepfun-ai/step-3.5-flash": 131072,
 	// ByteDance
@@ -371,6 +376,7 @@ const MAX_TOKENS: Record<string, number> = {
 	"meta/llama-4-maverick-17b-128e-instruct": 16384,
 	"meta/llama-4-scout-17b-16e-instruct": 16384,
 	"z-ai/glm4.7": 16384,
+	"z-ai/glm5": 16384,
 	"qwen/qwen3-coder-480b-a35b-instruct": 65536,
 	"nvidia/llama-3.1-nemotron-ultra-253b-v1": 32768,
 	"openai/gpt-oss-120b": 16384,
@@ -394,6 +400,7 @@ const FEATURED_MODELS = [
 	"moonshotai/kimi-k2-instruct-0905",
 	"minimaxai/minimax-m2.1",
 	"minimaxai/minimax-m2",
+	"z-ai/glm5",
 	"z-ai/glm4.7",
 	"openai/gpt-oss-120b",
 	"openai/gpt-oss-20b",
@@ -494,7 +501,7 @@ function nimStreamSimple(
 					// Inject chat_template_kwargs to enable thinking
 					p.chat_template_kwargs = thinkingConfig.enableKwargs;
 				} else if (thinkingConfig.disableKwargs) {
-					// Explicitly disable thinking (some models think by default, e.g. GLM-4.7)
+					// Explicitly disable thinking (some models think by default, e.g. GLM-5/4.7)
 					p.chat_template_kwargs = thinkingConfig.disableKwargs;
 				}
 			}

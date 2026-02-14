@@ -1,6 +1,6 @@
 # pi-nvidia-nim
 
-NVIDIA NIM API provider extension for [pi coding agent](https://github.com/badlogic/pi-mono) - access 100+ models from [build.nvidia.com](https://build.nvidia.com) including DeepSeek V3.2, Kimi K2.5, MiniMax M2.1, GLM-4.7, Qwen3, Llama 4, and many more.
+NVIDIA NIM API provider extension for [pi coding agent](https://github.com/badlogic/pi-mono) - access 100+ models from [build.nvidia.com](https://build.nvidia.com) including DeepSeek V3.2, Kimi K2.5, MiniMax M2.1, GLM-5, GLM-4.7, Qwen3, Llama 4, and many more.
 
 https://github.com/user-attachments/assets/f44773e4-9bf8-4bb5-a9c0-d5938030701c
 
@@ -73,10 +73,10 @@ When you change the thinking level in pi (`Shift+Tab` to cycle), the extension:
 1. **Maps `"minimal"` → `"low"`** - NIM only accepts `low`, `medium`, `high` (not `minimal`). Selecting "minimal" in pi works fine; it's silently mapped.
 2. **Injects `chat_template_kwargs`** per model to actually enable thinking:
    - DeepSeek V3.x, R1 distills: `{ thinking: true }`
-   - GLM-4.7: `{ enable_thinking: true, clear_thinking: false }`
+   - GLM-5, GLM-4.7: `{ enable_thinking: true, clear_thinking: false }`
    - Kimi K2.5, K2-thinking: `{ thinking: true }`
    - Qwen3, QwQ: `{ enable_thinking: true }`
-3. **Explicitly disables thinking** when the level is "off" for models that think by default (e.g., GLM-4.7).
+3. **Explicitly disables thinking** when the level is "off" for models that think by default (e.g., GLM-5, GLM-4.7).
 4. **Uses `system` role** instead of `developer` for all NIM models - the `developer` role combined with `chat_template_kwargs` causes 500 errors on NIM.
 
 ### Supported thinking levels
@@ -91,7 +91,7 @@ When you change the thinking level in pi (`Shift+Tab` to cycle), the extension:
 
 ## Available Models
 
-The extension ships with curated metadata for 38 featured models. At startup, it also queries the NVIDIA NIM API to discover additional models automatically.
+The extension ships with curated metadata for 39 featured models. At startup, it also queries the NVIDIA NIM API to discover additional models automatically.
 
 ### Featured Models
 
@@ -102,6 +102,7 @@ The extension ships with curated metadata for 38 featured models. At startup, it
 | `moonshotai/kimi-k2.5` | ✅ | | 256K |
 | `moonshotai/kimi-k2-thinking` | ✅ | | 128K |
 | `minimaxai/minimax-m2.1` | | | 1M |
+| `z-ai/glm5` | ✅ | | 128K |
 | `z-ai/glm4.7` | ✅ | | 128K |
 | `openai/gpt-oss-120b` | | | 128K |
 | `qwen/qwen3-coder-480b-a35b-instruct` | ✅ | | 256K |
@@ -120,7 +121,7 @@ The extension ships with curated metadata for 38 featured models. At startup, it
 
 ### Tool Calling
 
-All major models support OpenAI-compatible tool calling. Tested and confirmed working with DeepSeek V3.2, GLM-4.7, Qwen3, Kimi K2.5, and others.
+All major models support OpenAI-compatible tool calling. Tested and confirmed working with DeepSeek V3.2, GLM-5, GLM-4.7, Qwen3, Kimi K2.5, and others.
 
 ## How It Works
 
