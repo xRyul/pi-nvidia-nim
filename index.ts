@@ -636,6 +636,28 @@ async function fetchNimModels(apiKey: string): Promise<string[]> {
 // =============================================================================
 
 export default function (pi: ExtensionAPI) {
+	// Bail out cleanly if the user hasn't set up an API key yet. Without this
+	// guard, pi's flow can still route requests through this provider's
+	// streamSimple (e.g. when probing available providers, or when the
+	// configured default provider can't be resolved for any reason), which
+	// causes a fatal "NVIDIA_NIM_API_KEY environment variable is not set"
+	// error to be emitted on every `pi` invocation — even when the user
+	// never intended to use NVIDIA NIM. Skipping registration leaves the
+	// extension dormant: no NIM models appear in the picker, no provider is
+	// available to route to, and other providers (OpenAI, Anthropic, custom
+	// OpenAI-compatible endpoints in models.json, etc.) work normally.
+	//
+	// Re-enable by exporting the key:
+	//   export NVIDIA_NIM_API_KEY=nvapi-...
+	if (!process.env[NVIDIA_NIM_API_KEY_ENV]) {
+		// One-line, stderr, only on first load. Not fatal.
+		console.error(
+			`pi-nvidia-nim: ${NVIDIA_NIM_API_KEY_ENV} not set — extension dormant. ` +
+			`Set the key (https://build.nvidia.com) and reload pi to enable NVIDIA NIM models.`
+		);
+		return;
+	}
+
 	// Build the curated model list
 	const modelMap = new Map<string, NimModelEntry>();
 
@@ -660,7 +682,7 @@ export default function (pi: ExtensionAPI) {
 	// On session start, discover additional models from the API
 	pi.on("session_start", async (_event: any, ctx: any) => {
 		const apiKey = process.env[NVIDIA_NIM_API_KEY_ENV];
-		if (!apiKey) return; // API key not available, skip model discovery
+		if (!apiKey) return; // belt-and-suspenders: skip if env was unset after load
 
 		// Fetch live model list
 		const liveModelIds = await fetchNimModels(apiKey);
