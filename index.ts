@@ -460,6 +460,14 @@ function nimStreamSimple(
 	context: Context,
 	options?: SimpleStreamOptions,
 ): AssistantMessageEventStream {
+	// pi-coding-agent registers streamSimple globally per `api` type (not per provider).
+	// This streamer is invoked for ALL openai-completions providers (e.g. openrouter, openai),
+	// not just nvidia-nim. Pass non-NIM calls through unchanged so we don't leak the
+	// NVIDIA_NIM_API_KEY into other providers' Authorization headers.
+	if (model.provider !== PROVIDER_NAME) {
+		return streamSimpleOpenAICompletions(model as Model<"openai-completions">, context, options);
+	}
+
 	const thinkingConfig = THINKING_CONFIGS[model.id];
 	const reasoning = options?.reasoning;
 	const isThinkingEnabled = !!reasoning;
