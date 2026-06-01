@@ -834,7 +834,7 @@ async function fetchNimModels(apiKey: string): Promise<NimModelFetchResult> {
 // =============================================================================
 
 export default function (pi: ExtensionAPI) {
-	const providerApiKeyConfig = getNimApiKeyEnv() ?? NVIDIA_NIM_API_KEY_ENV;
+	const providerApiKeyConfig = getNimApiKeyEnv() ?? `$${NVIDIA_NIM_API_KEY_ENV}`;
 
 	// Always register the curated model list. The request path resolves credentials
 	// through pi first (CLI override, auth.json, shell command), then falls back to
@@ -897,7 +897,7 @@ export default function (pi: ExtensionAPI) {
 			const allModels = Array.from(modelMap.values());
 			ctx.modelRegistry.registerProvider(PROVIDER_NAME, {
 				baseUrl: NVIDIA_NIM_BASE_URL,
-				apiKey: getNimApiKeyEnv() ?? NVIDIA_NIM_API_KEY_ENV,
+				apiKey: getNimApiKeyEnv() ?? `$${NVIDIA_NIM_API_KEY_ENV}`,
 				api: "openai-completions",
 				authHeader: true,
 				models: allModels,
