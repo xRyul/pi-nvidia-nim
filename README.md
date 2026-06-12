@@ -110,6 +110,7 @@ The extension ships with curated metadata for 42 featured models. At startup, it
 | `moonshotai/kimi-k2.6` | ✅ | | 256K |
 | `moonshotai/kimi-k2-thinking` | ✅ | | 128K |
 | `minimaxai/minimax-m2.1` | | | 1M |
+| `minimaxai/minimax-m3` | | ✅ | 1M |
 | `z-ai/glm5` | ✅ | | 128K |
 | `z-ai/glm4.7` | ✅ | | 128K |
 | `openai/gpt-oss-120b` | | | 128K |

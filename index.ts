@@ -197,6 +197,7 @@ const VISION_MODELS = new Set([
 	"nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
 	"nvidia/nemotron-nano-12b-v2-vl",
 	"nvidia/cosmos-reason2-8b",
+	"minimaxai/minimax-m3",
 ]);
 
 // Embedding / non-chat models to skip
@@ -269,6 +270,7 @@ const CONTEXT_WINDOWS: Record<string, number> = {
 	"minimaxai/minimax-m2": 1048576,
 	"minimaxai/minimax-m2.1": 1048576,
 	"minimaxai/minimax-m2.7": 204800,
+	"minimaxai/minimax-m3": 1048576,
 	// Meta Llama
 	"meta/llama-3.1-405b-instruct": 131072,
 	"meta/llama-3.1-70b-instruct": 131072,
@@ -396,6 +398,7 @@ const MAX_TOKENS: Record<string, number> = {
 	"minimaxai/minimax-m2": 8192,
 	"minimaxai/minimax-m2.1": 8192,
 	"minimaxai/minimax-m2.7": 8192,
+	"minimaxai/minimax-m3": 8192,
 	"meta/llama-4-maverick-17b-128e-instruct": 16384,
 	"meta/llama-4-scout-17b-16e-instruct": 16384,
 	"z-ai/glm4.7": 16384,
@@ -423,9 +426,10 @@ const FEATURED_MODELS = [
 	"moonshotai/kimi-k2-thinking",
 	"moonshotai/kimi-k2-instruct",
 	"moonshotai/kimi-k2-instruct-0905",
-	"minimaxai/minimax-m2.1",
 	"minimaxai/minimax-m2",
+	"minimaxai/minimax-m2.1",
 	"minimaxai/minimax-m2.7",
+	"minimaxai/minimax-m3",
 	"z-ai/glm5",
 	"z-ai/glm4.7",
 	"openai/gpt-oss-120b",
