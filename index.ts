@@ -884,6 +884,11 @@ export default function (pi: ExtensionAPI) {
 
 	// On session start, discover additional models from the API
 	pi.on("session_start", async (_event, ctx) => {
+		// Allow disabling dynamic discovery via env var
+		if (process.env.NVIDIA_NIM_DISABLE_DYNAMIC_DISCOVERY === "true") {
+			return; // Skip dynamic discovery; keep only curated models
+		}
+
 		const apiKey = await resolveNimDiscoveryApiKey(ctx);
 		if (!apiKey) return;
 
