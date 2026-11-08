@@ -151,6 +151,14 @@ The custom streamer:
 
 The only configuration needed is either the `NVIDIA_NIM_API_KEY` or `NVIDIA_API_KEY` environment variable. All models on NVIDIA NIM are free during the preview period (with rate limits).
 
+### Disable dynamic model discovery
+
+By default the extension queries the NIM `/models` endpoint on session start and registers any additional chat models it finds beyond the curated list. To keep only the curated models, set:
+
+```bash
+export NVIDIA_NIM_DISABLE_DYNAMIC_DISCOVERY=true
+```
+
 ## Notes
 
 - All costs are set to `$0` since NVIDIA NIM preview models are free (rate-limited)
